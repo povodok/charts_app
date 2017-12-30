@@ -7,5 +7,6 @@ class DashboardController < ApplicationController
     gon.failing = data.failing
     gon.times = data.times
     gon.duration = data.duration
+    gon.abnormal_days = data.abnormal_days
   end
 end

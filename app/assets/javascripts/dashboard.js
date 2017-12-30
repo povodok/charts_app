@@ -1,8 +1,18 @@
-// Place all the behaviors and hooks related to the matching controller here.
-// All this logic will automatically be available in application.js.
+var points = [];
+gon.abnormal_days.forEach(function(item) {
+    points.push({
+            point: {
+                x: item,
+                y: gon.failing[item],
+                xAxis: 0,
+                yAxis: 0
+            },
+            text: 'abnormal'
+        });
+})
 
 $(function () {
-  Highcharts.chart('container', {
+  Highcharts.chart('first_chart', {
     title: {
       text: 'Passing and Failing builds per day'
     },
@@ -22,6 +32,10 @@ $(function () {
       align: 'right',
       verticalAlign: 'middle'
     },
+
+    annotations: [{
+        labels: points
+      }],
 
     series: [{
       name: 'Passing',
@@ -49,7 +63,7 @@ $(function () {
     }
   });
 
-  Highcharts.chart('container1', {
+  Highcharts.chart('second_chart', {
     title: {
       text: 'Duration vs Time'
     },
