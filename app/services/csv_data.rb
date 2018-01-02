@@ -1,7 +1,6 @@
 require 'csv'
 
 class CsvData
-  attr_accessor :failed
 
   def initialize(dir, file)
     @data = CSV.read(Rails.root.join(dir, file), headers: true)
@@ -12,11 +11,13 @@ class CsvData
       row['created_on'] = row['created_at'].split(' ').first
     end
 
-    @days = @data.map { |row| row['created_on'] }.uniq.sort.map(&:to_s)
+    @days ||= @data.select { |row| row['summary_status'] == 'passed' ||
+                                   row['summary_status'] == 'failed' }.
+                    map { |row| row['created_on'] }.uniq.sort.map(&:to_s)
   end
 
   def times
-    @times = @data.map { |row| row['created_at'] }.sort.map(&:to_s)
+    @times ||= @data.map { |row| row['created_at'] }.sort.map(&:to_s)
   end
 
   def passing
@@ -30,10 +31,10 @@ class CsvData
   end
 
   def failing
-    @failed = Hash.new(0)
+    @failed ||= Hash.new(0)
 
     @data.each do |row|
-      @failed[row['created_on']] += 1 if row['summary_status'] != 'passed'
+      @failed[row['created_on']] += 1 if row['summary_status'] == 'failed'
     end
 
     @failed.values_at(*@days)
@@ -56,7 +57,7 @@ class CsvData
     sum = fails.inject(0) { |sum, x| sum + (x - av) ** 2 }
     d = Math::sqrt(sum / (fails.sum + self.passing.sum))
 
-    ab_days = @failed.select { |k, v| v > av + 3 * d }.keys
+    ab_days = @failed.select { |_, v| v > av + 3 * d }.keys
     ab_days.map { |x| @days.index(x) }
   end
 end

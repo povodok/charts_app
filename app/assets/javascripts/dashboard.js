@@ -1,20 +1,24 @@
 var points = [];
 gon.abnormal_days.forEach(function(item) {
-    points.push({
-            point: {
-                x: item,
-                y: gon.failing[item],
-                xAxis: 0,
-                yAxis: 0
-            },
-            text: 'abnormal'
-        });
-})
+  points.push({
+    point: {
+      x: item,
+      y: gon.failing[item],
+      xAxis: 0,
+      yAxis: 0
+    },
+    text: 'abnormal'
+  });
+});
 
 $(function () {
-  Highcharts.chart('first_chart', {
+  Highcharts.chart('builds_per_day', {
+    chart: {
+      type: 'column'
+    },
+
     title: {
-      text: 'Passing and Failing builds per day'
+      text: 'Passed/Failed builds per day'
     },
 
     xAxis: {
@@ -22,48 +26,61 @@ $(function () {
     },
 
     yAxis: {
+      min: 0,
       title: {
-        text: 'Builds'
+        text: 'Number of builds'
+      },
+      stackLabels: {
+        enabled: true,
+        style: {
+          fontWeight: 'bold',
+          color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+        }
       }
     },
 
     legend: {
-      layout: 'vertical',
       align: 'right',
-      verticalAlign: 'middle'
+      x: -30,
+      verticalAlign: 'top',
+      y: 25,
+      floating: true,
+      backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+      borderColor: '#CCC',
+      borderWidth: 1,
+      shadow: false
+    },
+
+    tooltip: {
+      headerFormat: '<b>{point.x}</b><br/>',
+      pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+    },
+
+    plotOptions: {
+      column: {
+        stacking: 'normal',
+        dataLabels: {
+          enabled: true,
+          color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+        }
+      }
     },
 
     annotations: [{
-        labels: points
-      }],
+      labels: points
+    }],
 
     series: [{
       name: 'Passing',
       data: gon.passing
     },
-
     {
       name: 'Failing',
       data: gon.failing
-    }],
-
-    responsive: {
-      rules: [{
-        condition: {
-          maxWidth: 500
-        },
-        chartOptions: {
-          legend: {
-            layout: 'horizontal',
-            align: 'center',
-            verticalAlign: 'bottom'
-          }
-        }
-      }]
-    }
+    }]
   });
 
-  Highcharts.chart('second_chart', {
+  Highcharts.chart('duration_vs_time', {
     title: {
       text: 'Duration vs Time'
     },
